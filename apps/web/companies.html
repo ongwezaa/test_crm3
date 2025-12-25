@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Companies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body class="flex min-h-screen text-slate-700">
+    <aside class="sidebar w-64 text-white p-6 hidden lg:flex flex-col">
+      <div class="text-2xl font-bold mb-8">Local CRM</div>
+      <nav class="space-y-3 text-sm">
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="dashboard.html">
+          <i class="fa-solid fa-chart-column mr-2"></i> Dashboard
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="deals.html">
+          <i class="fa-solid fa-briefcase mr-2"></i> Deals
+        </a>
+        <a class="block bg-white/20 rounded-lg px-4 py-2" href="companies.html">
+          <i class="fa-solid fa-building mr-2"></i> Companies
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="contacts.html">
+          <i class="fa-solid fa-address-book mr-2"></i> Contacts
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="tasks.html">
+          <i class="fa-solid fa-list-check mr-2"></i> Tasks
+        </a>
+      </nav>
+      <button data-logout class="mt-auto bg-white/20 hover:bg-white/30 rounded-lg px-4 py-2 text-sm">
+        Logout
+      </button>
+    </aside>
+
+    <main class="flex-1">
+      <header class="flex items-center justify-between px-6 py-5 border-b bg-white">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-800">Companies</h1>
+          <p class="text-sm text-slate-500">Accounts overview</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <img data-user-avatar class="w-10 h-10 rounded-full" alt="avatar" />
+          <div>
+            <div data-user-name class="font-semibold text-sm text-slate-700"></div>
+            <div class="text-xs text-slate-400">Accounts</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="p-6">
+        <div class="card overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 text-left">
+              <tr>
+                <th class="px-4 py-3">Company</th>
+                <th class="px-4 py-3">Industry</th>
+                <th class="px-4 py-3">Website</th>
+                <th class="px-4 py-3">Phone</th>
+                <th class="px-4 py-3">Location</th>
+              </tr>
+            </thead>
+            <tbody id="companies-table"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="js/companies.js"></script>
+  </body>
+</html>
