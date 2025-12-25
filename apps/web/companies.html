@@ -56,16 +56,17 @@
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
               <tr>
-                <th class="px-4 py-3">Company</th>
-                <th class="px-4 py-3">Industry</th>
-                <th class="px-4 py-3">Website</th>
-                <th class="px-4 py-3">Phone</th>
-                <th class="px-4 py-3">Location</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="name">Company</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="industry">Industry</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="website">Website</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="phone">Phone</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="location">Location</th>
               </tr>
             </thead>
             <tbody id="companies-table"></tbody>
           </table>
         </div>
+        <div id="companies-pagination" class="flex flex-wrap items-center justify-between text-sm mt-3"></div>
       </section>
     </main>
 

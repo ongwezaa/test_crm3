@@ -4,7 +4,11 @@ import { ensureAuth, setUserHeader, setupLogout, showToast } from './common.js'
 const state = {
   deals: [],
   companies: [],
-  view: 'table'
+  view: 'table',
+  sortBy: 'amount',
+  sortDir: 'desc',
+  page: 1,
+  pageSize: 10
 }
 
 const stages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Won', 'Lost']
@@ -90,10 +94,46 @@ const renderPipeline = (deals) => {
   })
 }
 
+const renderPagination = (total) => {
+  const container = document.getElementById('deals-pagination')
+  const totalPages = Math.max(1, Math.ceil(total / state.pageSize))
+  state.page = Math.min(state.page, totalPages)
+  container.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span>Rows per page</span>
+      <select id="page-size" class="border rounded px-2 py-1">
+        ${[10, 50, 100]
+          .map((size) => `<option value="${size}" ${size === state.pageSize ? 'selected' : ''}>${size}</option>`)
+          .join('')}
+      </select>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="prev-page" class="px-3 py-1 border rounded" ${state.page === 1 ? 'disabled' : ''}>Prev</button>
+      <span>Page ${state.page} of ${totalPages}</span>
+      <button id="next-page" class="px-3 py-1 border rounded" ${state.page === totalPages ? 'disabled' : ''}>Next</button>
+    </div>
+  `
+  container.querySelector('#page-size').addEventListener('change', (event) => {
+    state.pageSize = Number(event.target.value)
+    state.page = 1
+    applyFilters()
+  })
+  container.querySelector('#prev-page').addEventListener('click', () => {
+    state.page = Math.max(1, state.page - 1)
+    applyFilters()
+  })
+  container.querySelector('#next-page').addEventListener('click', () => {
+    state.page += 1
+    applyFilters()
+  })
+}
+
 const applyFilters = () => {
   const search = document.getElementById('deal-search').value.toLowerCase()
   const stage = document.getElementById('stage-filter').value
-  const sortBy = document.getElementById('sort-by').value
+  const sortBySelect = document.getElementById('sort-by')
+  const sortBy = state.sortBy || sortBySelect.value
+  sortBySelect.value = sortBy
 
   let result = [...state.deals]
   if (search) {
@@ -102,15 +142,25 @@ const applyFilters = () => {
   if (stage) {
     result = result.filter((deal) => deal.stage === stage)
   }
+  const direction = state.sortDir === 'asc' ? 1 : -1
   result.sort((a, b) => {
+    const valueA = sortBy === 'company' ? getCompanyName(a.companyId) : sortBy === 'owner' ? a.ownerId : a[sortBy]
+    const valueB = sortBy === 'company' ? getCompanyName(b.companyId) : sortBy === 'owner' ? b.ownerId : b[sortBy]
     if (sortBy === 'closeDate') {
-      return new Date(a.closeDate) - new Date(b.closeDate)
+      return (new Date(valueA) - new Date(valueB)) * direction
     }
-    return b[sortBy] - a[sortBy]
+    if (typeof valueA === 'number') {
+      return (valueA - valueB) * direction
+    }
+    return valueA.toString().localeCompare(valueB.toString()) * direction
   })
 
   if (state.view === 'table') {
-    renderTable(result)
+    const total = result.length
+    const start = (state.page - 1) * state.pageSize
+    const paged = result.slice(start, start + state.pageSize)
+    renderTable(paged)
+    renderPagination(total)
   } else {
     renderPipeline(result)
   }
@@ -163,7 +213,23 @@ const init = async () => {
 
   document.getElementById('deal-search').addEventListener('input', applyFilters)
   document.getElementById('stage-filter').addEventListener('change', applyFilters)
-  document.getElementById('sort-by').addEventListener('change', applyFilters)
+  document.getElementById('sort-by').addEventListener('change', (event) => {
+    state.sortBy = event.target.value
+    state.sortDir = 'desc'
+    applyFilters()
+  })
+  document.querySelectorAll('th[data-sort]').forEach((header) => {
+    header.addEventListener('click', () => {
+      const field = header.dataset.sort
+      if (state.sortBy === field) {
+        state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc'
+      } else {
+        state.sortBy = field
+        state.sortDir = 'asc'
+      }
+      applyFilters()
+    })
+  })
 
   applyFilters()
 }

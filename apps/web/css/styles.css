@@ -69,6 +69,22 @@ body {
   font-weight: 600;
 }
 
+.dashboard-page main {
+  max-height: 100vh;
+}
+
+.dashboard-page section {
+  padding-bottom: 12px;
+}
+
+.dashboard-page .card canvas {
+  max-height: 180px;
+}
+
+.dashboard-page #activity-feed li:last-child {
+  border-bottom: none;
+}
+
 .bg-indigo-600 {
   background: linear-gradient(90deg, #1e3a8a, #2563eb);
 }

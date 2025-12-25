@@ -40,7 +40,7 @@ const initCharts = (charts) => {
         {
           label: 'Deals',
           data: charts.dealsByStage.map((item) => item.count),
-          backgroundColor: '#6366f1'
+          backgroundColor: '#c7d2fe'
         }
       ]
     },
@@ -56,8 +56,8 @@ const initCharts = (charts) => {
         {
           label: 'Pipeline',
           data: charts.pipelineSeries.map((item) => item.value),
-          borderColor: '#14b8a6',
-          backgroundColor: 'rgba(20, 184, 166, 0.2)',
+          borderColor: '#93c5fd',
+          backgroundColor: 'rgba(147, 197, 253, 0.35)',
           fill: true,
           tension: 0.3
         }
@@ -74,7 +74,7 @@ const initCharts = (charts) => {
       datasets: [
         {
           data: [charts.dealsWonLost.won, charts.dealsWonLost.lost],
-          backgroundColor: ['#22c55e', '#ef4444']
+          backgroundColor: ['#bbf7d0', '#fecaca']
         }
       ]
     }
@@ -88,7 +88,7 @@ const initCharts = (charts) => {
       datasets: [
         {
           data: charts.tasksByStatus.map((item) => item.count),
-          backgroundColor: ['#f97316', '#0ea5e9', '#22c55e']
+          backgroundColor: ['#fed7aa', '#bae6fd', '#bbf7d0']
         }
       ]
     }
@@ -103,8 +103,8 @@ const initCharts = (charts) => {
         {
           label: 'Contacts',
           data: charts.contactsPerWeek.map((item) => item.count),
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+          borderColor: '#a5b4fc',
+          backgroundColor: 'rgba(165, 180, 252, 0.35)',
           fill: true,
           tension: 0.4
         }
@@ -116,7 +116,7 @@ const initCharts = (charts) => {
 const renderActivities = (activities) => {
   const list = document.getElementById('activity-feed')
   list.innerHTML = ''
-  activities.forEach((activity) => {
+  activities.slice(0, 5).forEach((activity) => {
     const item = document.createElement('li')
     item.className = 'flex items-center justify-between border-b border-slate-100 pb-2'
     item.innerHTML = `

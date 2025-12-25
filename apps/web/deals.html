@@ -69,9 +69,13 @@
               <option value="Lost">Lost</option>
             </select>
             <select id="sort-by" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="name">Sort: Deal</option>
+              <option value="company">Sort: Company</option>
+              <option value="stage">Sort: Stage</option>
               <option value="amount">Sort: Amount</option>
-              <option value="closeDate">Sort: Close Date</option>
               <option value="probability">Sort: Probability</option>
+              <option value="owner">Sort: Owner</option>
+              <option value="closeDate">Sort: Close Date</option>
             </select>
           </div>
         </div>
@@ -80,18 +84,19 @@
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
               <tr>
-                <th class="px-4 py-3">Deal</th>
-                <th class="px-4 py-3">Company</th>
-                <th class="px-4 py-3">Stage</th>
-                <th class="px-4 py-3">Amount</th>
-                <th class="px-4 py-3">Probability</th>
-                <th class="px-4 py-3">Owner</th>
-                <th class="px-4 py-3">Close Date</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="name">Deal</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="company">Company</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="stage">Stage</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="amount">Amount</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="probability">Probability</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="owner">Owner</th>
+                <th class="px-4 py-3 cursor-pointer" data-sort="closeDate">Close Date</th>
               </tr>
             </thead>
             <tbody id="deals-table"></tbody>
           </table>
         </div>
+        <div id="deals-pagination" class="flex flex-wrap items-center justify-between text-sm"></div>
 
         <div id="pipeline-container" class="hidden">
           <div id="pipeline-board" class="flex gap-4 overflow-x-auto"></div>
