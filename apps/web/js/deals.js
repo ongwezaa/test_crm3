@@ -12,10 +12,93 @@ const state = {
 }
 
 const stages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Won', 'Lost']
+const soonThresholdDays = 14
 
 const getCompanyName = (id) => state.companies.find((company) => company.id === id)?.name || 'Unknown'
 
 const formatMoney = (value) => `$${Number(value).toLocaleString()}`
+
+const formatPercent = (value) => `${Math.round(value)}%`
+
+const daysUntil = (dateString) => {
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) return null
+  const diffMs = date.setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)
+  return Math.round(diffMs / (1000 * 60 * 60 * 24))
+}
+
+const renderInsights = () => {
+  const totalValue = state.deals.reduce((sum, deal) => sum + Number(deal.amount || 0), 0)
+  const weightedForecast = state.deals.reduce(
+    (sum, deal) => sum + Number(deal.amount || 0) * (Number(deal.probability || 0) / 100),
+    0
+  )
+  const closedDeals = state.deals.filter((deal) => ['Won', 'Lost'].includes(deal.stage))
+  const wonDeals = closedDeals.filter((deal) => deal.stage === 'Won')
+  const winRate = closedDeals.length ? (wonDeals.length / closedDeals.length) * 100 : 0
+  const closingSoon = state.deals.filter((deal) => {
+    const days = daysUntil(deal.closeDate)
+    return days !== null && days <= soonThresholdDays && days >= 0
+  }).length
+
+  document.getElementById('metric-total').textContent = formatMoney(totalValue)
+  document.getElementById('metric-forecast').textContent = formatMoney(weightedForecast.toFixed(0))
+  document.getElementById('metric-winrate').textContent = formatPercent(winRate)
+  document.getElementById('metric-soon').textContent = closingSoon.toString()
+
+  const stageBars = document.getElementById('stage-bars')
+  stageBars.innerHTML = ''
+  const totalDeals = Math.max(1, state.deals.length)
+  stages.forEach((stage) => {
+    const count = state.deals.filter((deal) => deal.stage === stage).length
+    const percentage = Math.round((count / totalDeals) * 100)
+    const bar = document.createElement('div')
+    bar.innerHTML = `
+      <div class="flex items-center justify-between text-xs text-slate-500">
+        <span>${stage}</span>
+        <span>${count} • ${percentage}%</span>
+      </div>
+      <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+        <div class="h-2 rounded-full bg-indigo-500" style="width:${percentage}%"></div>
+      </div>
+    `
+    stageBars.appendChild(bar)
+  })
+
+  const aiContainer = document.getElementById('ai-recommendations')
+  aiContainer.innerHTML = ''
+  const needsAttention = state.deals
+    .filter((deal) => deal.stage !== 'Won' && deal.stage !== 'Lost')
+    .map((deal) => ({
+      ...deal,
+      urgency: (daysUntil(deal.closeDate) ?? 999) - Number(deal.probability || 0) / 10
+    }))
+    .sort((a, b) => a.urgency - b.urgency)
+    .slice(0, 4)
+
+  if (!needsAttention.length) {
+    aiContainer.innerHTML = '<p class="text-sm text-slate-500">No open deals need attention right now.</p>'
+    return
+  }
+
+  needsAttention.forEach((deal) => {
+    const days = daysUntil(deal.closeDate)
+    const line = document.createElement('label')
+    line.className = 'flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3'
+    line.innerHTML = `
+      <input type="checkbox" class="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600" />
+      <div>
+        <p class="font-semibold text-slate-700">${deal.name}</p>
+        <p class="text-xs text-slate-500">
+          ${getCompanyName(deal.companyId)} • ${deal.stage} • ${formatMoney(deal.amount)}
+          ${days !== null ? `• closes in ${days}d` : ''}
+        </p>
+        <p class="text-xs text-indigo-600 mt-1">Suggested: send follow-up + update probability</p>
+      </div>
+    `
+    aiContainer.appendChild(line)
+  })
+}
 
 const renderTable = (deals) => {
   const tbody = document.getElementById('deals-table')
@@ -164,6 +247,8 @@ const applyFilters = () => {
   } else {
     renderPipeline(result)
   }
+
+  renderInsights()
 }
 
 const saveDealUpdate = async (deal, payload) => {
