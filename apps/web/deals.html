@@ -80,6 +80,90 @@
           </div>
         </div>
 
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="card p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-800">Pipeline snapshot</h2>
+                <p class="text-xs text-slate-500">AI-weighted forecast and pipeline health</p>
+              </div>
+              <span class="badge bg-indigo-50 text-indigo-600">Live</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-xs uppercase text-slate-400">Total value</p>
+                <p id="metric-total" class="text-lg font-semibold text-slate-800">$0</p>
+              </div>
+              <div>
+                <p class="text-xs uppercase text-slate-400">Weighted forecast</p>
+                <p id="metric-forecast" class="text-lg font-semibold text-slate-800">$0</p>
+              </div>
+              <div>
+                <p class="text-xs uppercase text-slate-400">Win rate</p>
+                <p id="metric-winrate" class="text-lg font-semibold text-slate-800">0%</p>
+              </div>
+              <div>
+                <p class="text-xs uppercase text-slate-400">Deals closing soon</p>
+                <p id="metric-soon" class="text-lg font-semibold text-slate-800">0</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase text-slate-400 mb-2">Stage distribution</p>
+              <div id="stage-bars" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <div class="card p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-800">AI assistant queue</h2>
+                <p class="text-xs text-slate-500">Suggested actions to keep deals moving</p>
+              </div>
+              <button class="text-xs text-indigo-600 font-semibold">Generate tasks</button>
+            </div>
+            <div id="ai-recommendations" class="space-y-3 text-sm"></div>
+            <div class="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
+              Tip: Use AI to auto-create follow-up sequences, update probability, and highlight risks.
+            </div>
+          </div>
+
+          <div class="card p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-800">Automations & sequences</h2>
+                <p class="text-xs text-slate-500">Launch multi-step outreach like Monday.com</p>
+              </div>
+              <span class="badge bg-emerald-50 text-emerald-600">3 active</span>
+            </div>
+            <div class="space-y-3 text-sm">
+              <div class="flex items-start gap-3 rounded-lg border border-slate-200 p-3">
+                <div class="mt-1 h-2 w-2 rounded-full bg-indigo-500"></div>
+                <div>
+                  <p class="font-semibold text-slate-700">Lead sequence</p>
+                  <p class="text-xs text-slate-500">Email + call reminders over 7 days</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 rounded-lg border border-slate-200 p-3">
+                <div class="mt-1 h-2 w-2 rounded-full bg-emerald-500"></div>
+                <div>
+                  <p class="font-semibold text-slate-700">Auto-assign owners</p>
+                  <p class="text-xs text-slate-500">Rotate leads to available reps</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 rounded-lg border border-slate-200 p-3">
+                <div class="mt-1 h-2 w-2 rounded-full bg-amber-500"></div>
+                <div>
+                  <p class="font-semibold text-slate-700">Deal health alerts</p>
+                  <p class="text-xs text-slate-500">Notify when probability drops below 40%</p>
+                </div>
+              </div>
+            </div>
+            <button class="w-full border border-indigo-200 text-indigo-600 rounded-lg py-2 text-sm font-semibold">
+              Add automation
+            </button>
+          </div>
+        </div>
+
         <div id="table-container" class="card overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
