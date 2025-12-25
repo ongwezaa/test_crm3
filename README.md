@@ -25,8 +25,8 @@ npm run db:seed
 npm run dev
 ```
 
-The API runs at `http://localhost:4000`.
-The web UI is served from the same dev server, so open `http://localhost:4000` after running `npm run dev`.
+The API runs at `http://localhost:4005`.
+The web UI is served from the same dev server, so open `http://localhost:4005` after running `npm run dev`.
 
 ## Frontend Setup
 
