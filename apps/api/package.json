@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --loader ts-node/esm src/index.ts",
-    "db:init": "ts-node --loader ts-node/esm src/scripts/initDb.ts",
-    "db:seed": "ts-node --loader ts-node/esm src/scripts/seedDb.ts"
+    "dev": "ts-node-esm src/index.ts",
+    "db:init": "ts-node-esm src/scripts/initDb.ts",
+    "db:seed": "ts-node-esm src/scripts/seedDb.ts"
   },
   "dependencies": {
     "cors": "2.8.5",
