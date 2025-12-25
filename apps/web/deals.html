@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body class="flex min-h-screen text-slate-700">
+    <aside class="sidebar w-64 text-white p-6 hidden lg:flex flex-col">
+      <div class="text-2xl font-bold mb-8">Local CRM</div>
+      <nav class="space-y-3 text-sm">
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="dashboard.html">
+          <i class="fa-solid fa-chart-column mr-2"></i> Dashboard
+        </a>
+        <a class="block bg-white/20 rounded-lg px-4 py-2" href="deals.html">
+          <i class="fa-solid fa-briefcase mr-2"></i> Deals
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="companies.html">
+          <i class="fa-solid fa-building mr-2"></i> Companies
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="contacts.html">
+          <i class="fa-solid fa-address-book mr-2"></i> Contacts
+        </a>
+        <a class="block hover:bg-white/10 rounded-lg px-4 py-2" href="tasks.html">
+          <i class="fa-solid fa-list-check mr-2"></i> Tasks
+        </a>
+      </nav>
+      <button data-logout class="mt-auto bg-white/20 hover:bg-white/30 rounded-lg px-4 py-2 text-sm">
+        Logout
+      </button>
+    </aside>
+
+    <main class="flex-1">
+      <header class="flex items-center justify-between px-6 py-5 border-b bg-white">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-800">Deals</h1>
+          <p class="text-sm text-slate-500">Track deals across your pipeline</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <img data-user-avatar class="w-10 h-10 rounded-full" alt="avatar" />
+          <div>
+            <div data-user-name class="font-semibold text-sm text-slate-700"></div>
+            <div class="text-xs text-slate-400">Sales</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="p-6 space-y-4">
+        <div class="flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex gap-2">
+            <button id="table-view" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Table View</button>
+            <button id="pipeline-view" class="bg-white border px-4 py-2 rounded-lg text-sm">Pipeline View</button>
+          </div>
+          <div class="flex gap-3">
+            <input id="deal-search" class="border rounded-lg px-3 py-2 text-sm" placeholder="Search deals" />
+            <select id="stage-filter" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="">All Stages</option>
+              <option value="Lead">Lead</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Proposal">Proposal</option>
+              <option value="Negotiation">Negotiation</option>
+              <option value="Won">Won</option>
+              <option value="Lost">Lost</option>
+            </select>
+            <select id="sort-by" class="border rounded-lg px-3 py-2 text-sm">
+              <option value="amount">Sort: Amount</option>
+              <option value="closeDate">Sort: Close Date</option>
+              <option value="probability">Sort: Probability</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="table-container" class="card overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 text-left">
+              <tr>
+                <th class="px-4 py-3">Deal</th>
+                <th class="px-4 py-3">Company</th>
+                <th class="px-4 py-3">Stage</th>
+                <th class="px-4 py-3">Amount</th>
+                <th class="px-4 py-3">Probability</th>
+                <th class="px-4 py-3">Owner</th>
+                <th class="px-4 py-3">Close Date</th>
+              </tr>
+            </thead>
+            <tbody id="deals-table"></tbody>
+          </table>
+        </div>
+
+        <div id="pipeline-container" class="hidden">
+          <div id="pipeline-board" class="flex gap-4 overflow-x-auto"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="js/deals.js"></script>
+  </body>
+</html>
