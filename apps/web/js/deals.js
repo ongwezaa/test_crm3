@@ -148,7 +148,7 @@ const renderPipeline = (deals) => {
     column.className = 'pipeline-column'
     column.innerHTML = `
       <div class="card p-3">
-        <div class="font-semibold text-slate-700 mb-3">${stage}</div>
+        <div class="pipeline-stage stage-fill-${stage.toLowerCase()} mb-3">${stage}</div>
         <div class="space-y-3" data-stage="${stage}"></div>
       </div>
     `
@@ -328,19 +328,30 @@ const init = async () => {
   state.companies = companies
   populateDealModal()
 
-  document.getElementById('table-view').addEventListener('click', () => {
-    state.view = 'table'
-    document.getElementById('table-container').classList.remove('hidden')
-    document.getElementById('pipeline-container').classList.add('hidden')
-    applyFilters()
-  })
+  const tableButton = document.getElementById('table-view')
+  const pipelineButton = document.getElementById('pipeline-view')
 
-  document.getElementById('pipeline-view').addEventListener('click', () => {
-    state.view = 'pipeline'
-    document.getElementById('table-container').classList.add('hidden')
-    document.getElementById('pipeline-container').classList.remove('hidden')
+  const updateViewButtons = () => {
+    const activeClasses = ['bg-indigo-600', 'text-white', 'border-transparent']
+    const inactiveClasses = ['bg-white', 'text-slate-700', 'border-slate-200']
+    const setActive = (button, isActive) => {
+      activeClasses.forEach((className) => button.classList.toggle(className, isActive))
+      inactiveClasses.forEach((className) => button.classList.toggle(className, !isActive))
+    }
+    setActive(tableButton, state.view === 'table')
+    setActive(pipelineButton, state.view === 'pipeline')
+  }
+
+  const setView = (view) => {
+    state.view = view
+    document.getElementById('table-container').classList.toggle('hidden', view !== 'table')
+    document.getElementById('pipeline-container').classList.toggle('hidden', view !== 'pipeline')
+    updateViewButtons()
     applyFilters()
-  })
+  }
+
+  tableButton.addEventListener('click', () => setView('table'))
+  pipelineButton.addEventListener('click', () => setView('pipeline'))
 
   document.getElementById('deal-search').addEventListener('input', applyFilters)
   document.getElementById('stage-filter').addEventListener('change', applyFilters)
@@ -400,6 +411,7 @@ const init = async () => {
     })
   })
 
+  updateViewButtons()
   applyFilters()
 }
 
