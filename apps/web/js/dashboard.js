@@ -40,11 +40,27 @@ const initCharts = (charts) => {
         {
           label: 'Deals',
           data: charts.dealsByStage.map((item) => item.count),
-          backgroundColor: '#c7d2fe'
+          backgroundColor: '#2563eb',
+          borderColor: '#1e40af',
+          borderWidth: 1
         }
       ]
     },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Stage' }
+        },
+        y: {
+          title: { display: true, text: 'Deals' },
+          ticks: { precision: 0 }
+        }
+      }
+    }
   })
 
   const pipelineCtx = document.getElementById('chart-pipeline')
@@ -54,16 +70,29 @@ const initCharts = (charts) => {
       labels: charts.pipelineSeries.map((item) => item.date),
       datasets: [
         {
-          label: 'Pipeline',
+          label: 'Pipeline Value',
           data: charts.pipelineSeries.map((item) => item.value),
-          borderColor: '#93c5fd',
-          backgroundColor: 'rgba(147, 197, 253, 0.35)',
+          borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(37, 99, 235, 0.35)',
           fill: true,
           tension: 0.3
         }
       ]
     },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Date' }
+        },
+        y: {
+          title: { display: true, text: 'Value ($)' }
+        }
+      }
+    }
   })
 
   const wonLostCtx = document.getElementById('chart-won-lost')
@@ -73,10 +102,17 @@ const initCharts = (charts) => {
       labels: ['Won', 'Lost'],
       datasets: [
         {
+          label: 'Deals',
           data: [charts.dealsWonLost.won, charts.dealsWonLost.lost],
-          backgroundColor: ['#bbf7d0', '#fecaca']
+          backgroundColor: ['#22c55e', '#ef4444']
         }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
     }
   })
 
@@ -87,10 +123,17 @@ const initCharts = (charts) => {
       labels: charts.tasksByStatus.map((item) => item.status),
       datasets: [
         {
+          label: 'Tasks',
           data: charts.tasksByStatus.map((item) => item.count),
-          backgroundColor: ['#fed7aa', '#bae6fd', '#bbf7d0']
+          backgroundColor: ['#f97316', '#0ea5e9', '#10b981']
         }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
     }
   })
 
@@ -101,14 +144,29 @@ const initCharts = (charts) => {
       labels: charts.contactsPerWeek.map((item) => item.week),
       datasets: [
         {
-          label: 'Contacts',
+          label: 'New Contacts',
           data: charts.contactsPerWeek.map((item) => item.count),
-          borderColor: '#a5b4fc',
-          backgroundColor: 'rgba(165, 180, 252, 0.35)',
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124, 58, 237, 0.25)',
           fill: true,
           tension: 0.4
         }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Week' }
+        },
+        y: {
+          title: { display: true, text: 'Contacts' },
+          ticks: { precision: 0 }
+        }
+      }
     }
   })
 }
