@@ -1,12 +1,14 @@
 import { api } from './api.js'
-import { ensureAuth, setUserHeader, setupLogout } from './common.js'
+import { ensureAuth, setUserHeader, setupLogout, showToast } from './common.js'
 
 const state = {
   companies: [],
   sortBy: 'name',
   sortDir: 'asc',
   page: 1,
-  pageSize: 10
+  pageSize: 10,
+  currentUser: null,
+  editingCompanyId: null
 }
 
 const render = (companies) => {
@@ -21,7 +23,11 @@ const render = (companies) => {
       <td class="px-4 py-3 text-indigo-600">${company.website}</td>
       <td class="px-4 py-3">${company.phone}</td>
       <td class="px-4 py-3">${company.location}</td>
+      <td class="px-4 py-3">
+        <button class="edit-company text-indigo-600 text-sm font-semibold" data-id="${company.id}">Edit</button>
+      </td>
     `
+    row.querySelector('.edit-company').addEventListener('click', () => openCompanyModal('edit', company))
     tbody.appendChild(row)
   })
 }
@@ -70,13 +76,86 @@ const applySort = () => {
   renderPagination(total)
 }
 
+const openCompanyModal = (mode, company = null) => {
+  const modal = document.getElementById('company-modal')
+  const title = document.getElementById('company-modal-title')
+  const nameInput = document.getElementById('company-name')
+  const industryInput = document.getElementById('company-industry')
+  const websiteInput = document.getElementById('company-website')
+  const phoneInput = document.getElementById('company-phone')
+  const locationInput = document.getElementById('company-location')
+
+  title.textContent = mode === 'edit' ? 'Edit Company' : 'Add Company'
+  if (mode === 'edit' && company) {
+    state.editingCompanyId = company.id
+    nameInput.value = company.name
+    industryInput.value = company.industry
+    websiteInput.value = company.website
+    phoneInput.value = company.phone
+    locationInput.value = company.location
+  } else {
+    state.editingCompanyId = null
+    nameInput.value = ''
+    industryInput.value = ''
+    websiteInput.value = ''
+    phoneInput.value = ''
+    locationInput.value = ''
+  }
+
+  modal.classList.remove('hidden')
+  modal.classList.add('flex')
+}
+
+const closeCompanyModal = () => {
+  const modal = document.getElementById('company-modal')
+  modal.classList.add('hidden')
+  modal.classList.remove('flex')
+}
+
 const init = async () => {
   const user = await ensureAuth()
   if (!user) return
   setUserHeader(user)
   setupLogout()
+  state.currentUser = user
 
   state.companies = await api.getCompanies()
+
+  document.getElementById('add-company').addEventListener('click', () => openCompanyModal('add'))
+  document.getElementById('close-company-modal').addEventListener('click', closeCompanyModal)
+  document.getElementById('cancel-company').addEventListener('click', closeCompanyModal)
+  document.getElementById('company-modal').addEventListener('click', (event) => {
+    if (event.target.id === 'company-modal') {
+      closeCompanyModal()
+    }
+  })
+  document.getElementById('company-form').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const payload = {
+      name: document.getElementById('company-name').value.trim(),
+      industry: document.getElementById('company-industry').value.trim(),
+      website: document.getElementById('company-website').value.trim(),
+      phone: document.getElementById('company-phone').value.trim(),
+      location: document.getElementById('company-location').value.trim(),
+      ownerId: state.currentUser?.id || ''
+    }
+
+    try {
+      if (state.editingCompanyId) {
+        const updated = await api.updateCompany(state.editingCompanyId, payload)
+        state.companies = state.companies.map((item) => (item.id === updated.id ? updated : item))
+        showToast('Company updated')
+      } else {
+        const created = await api.createCompany(payload)
+        state.companies = [created, ...state.companies]
+        showToast('Company added')
+      }
+      closeCompanyModal()
+      applySort()
+    } catch (error) {
+      showToast(error.message || 'Failed to save company')
+    }
+  })
 
   document.querySelectorAll('th[data-sort]').forEach((header) => {
     header.addEventListener('click', () => {

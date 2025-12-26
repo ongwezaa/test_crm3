@@ -9,7 +9,9 @@ const state = {
   sortBy: 'dueDate',
   sortDir: 'asc',
   page: 1,
-  pageSize: 10
+  pageSize: 10,
+  currentUser: null,
+  editingTaskId: null
 }
 
 const render = (tasks) => {
@@ -23,39 +25,16 @@ const render = (tasks) => {
     const dueDate = new Date(task.dueDate)
     const overdue = dueDate < today && task.status !== 'Done'
     row.innerHTML = `
-      <td class="px-4 py-3 font-medium" contenteditable data-field="title">${task.title}</td>
-      <td class="px-4 py-3">
-        <select class="border rounded px-2 py-1 text-sm" data-field="status">
-          ${statusOptions
-            .map((status) => `<option value="${status}" ${status === task.status ? 'selected' : ''}>${status}</option>`)
-            .join('')}
-        </select>
-      </td>
-      <td class="px-4 py-3">
-        <select class="border rounded px-2 py-1 text-sm" data-field="priority">
-          ${priorityOptions
-            .map((priority) => `<option value="${priority}" ${priority === task.priority ? 'selected' : ''}>${priority}</option>`)
-            .join('')}
-        </select>
-      </td>
-      <td class="px-4 py-3 ${overdue ? 'overdue' : ''}" contenteditable data-field="dueDate">${task.dueDate.slice(0, 10)}</td>
+      <td class="px-4 py-3 font-medium">${task.title}</td>
+      <td class="px-4 py-3">${task.status}</td>
+      <td class="px-4 py-3">${task.priority}</td>
+      <td class="px-4 py-3 ${overdue ? 'overdue' : ''}">${task.dueDate.slice(0, 10)}</td>
       <td class="px-4 py-3 text-xs text-slate-500">${task.assignedTo.slice(0, 6).toUpperCase()}</td>
+      <td class="px-4 py-3">
+        <button class="edit-task text-indigo-600 text-sm font-semibold" data-id="${task.id}">Edit</button>
+      </td>
     `
-
-    row.querySelectorAll('[contenteditable]').forEach((cell) => {
-      cell.addEventListener('blur', async (event) => {
-        const field = event.target.dataset.field
-        const value = event.target.textContent.trim()
-        await saveTaskUpdate(task, { [field]: value })
-      })
-    })
-
-    row.querySelectorAll('select').forEach((select) => {
-      select.addEventListener('change', async (event) => {
-        const field = event.target.dataset.field
-        await saveTaskUpdate(task, { [field]: event.target.value })
-      })
-    })
+    row.querySelector('.edit-task').addEventListener('click', () => openTaskModal('edit', task))
 
     tbody.appendChild(row)
   })
@@ -112,14 +91,44 @@ const applySort = () => {
   renderPagination(total)
 }
 
-const saveTaskUpdate = async (task, payload) => {
-  try {
-    const updated = await api.updateTask(task.id, { ...task, ...payload })
-    task = updated
-    showToast('Task updated')
-  } catch (error) {
-    showToast(error.message || 'Failed to update task')
+const populateTaskModal = () => {
+  const statusSelect = document.getElementById('task-status')
+  const prioritySelect = document.getElementById('task-priority')
+  statusSelect.innerHTML = statusOptions.map((status) => `<option value="${status}">${status}</option>`).join('')
+  prioritySelect.innerHTML = priorityOptions.map((priority) => `<option value="${priority}">${priority}</option>`).join('')
+}
+
+const openTaskModal = (mode, task = null) => {
+  const modal = document.getElementById('task-modal')
+  const title = document.getElementById('task-modal-title')
+  const titleInput = document.getElementById('task-title')
+  const statusSelect = document.getElementById('task-status')
+  const prioritySelect = document.getElementById('task-priority')
+  const dueDateInput = document.getElementById('task-due-date')
+
+  title.textContent = mode === 'edit' ? 'Edit Task' : 'Add Task'
+  if (mode === 'edit' && task) {
+    state.editingTaskId = task.id
+    titleInput.value = task.title
+    statusSelect.value = task.status
+    prioritySelect.value = task.priority
+    dueDateInput.value = task.dueDate.slice(0, 10)
+  } else {
+    state.editingTaskId = null
+    titleInput.value = ''
+    statusSelect.value = statusOptions[0]
+    prioritySelect.value = priorityOptions[1]
+    dueDateInput.value = new Date().toISOString().slice(0, 10)
   }
+
+  modal.classList.remove('hidden')
+  modal.classList.add('flex')
+}
+
+const closeTaskModal = () => {
+  const modal = document.getElementById('task-modal')
+  modal.classList.add('hidden')
+  modal.classList.remove('flex')
 }
 
 const init = async () => {
@@ -127,8 +136,45 @@ const init = async () => {
   if (!user) return
   setUserHeader(user)
   setupLogout()
+  state.currentUser = user
 
   state.tasks = await api.getTasks()
+  populateTaskModal()
+
+  document.getElementById('add-task').addEventListener('click', () => openTaskModal('add'))
+  document.getElementById('close-task-modal').addEventListener('click', closeTaskModal)
+  document.getElementById('cancel-task').addEventListener('click', closeTaskModal)
+  document.getElementById('task-modal').addEventListener('click', (event) => {
+    if (event.target.id === 'task-modal') {
+      closeTaskModal()
+    }
+  })
+  document.getElementById('task-form').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const payload = {
+      title: document.getElementById('task-title').value.trim(),
+      status: document.getElementById('task-status').value,
+      priority: document.getElementById('task-priority').value,
+      dueDate: document.getElementById('task-due-date').value,
+      assignedTo: state.currentUser?.id || ''
+    }
+
+    try {
+      if (state.editingTaskId) {
+        const updated = await api.updateTask(state.editingTaskId, payload)
+        state.tasks = state.tasks.map((item) => (item.id === updated.id ? updated : item))
+        showToast('Task updated')
+      } else {
+        const created = await api.createTask(payload)
+        state.tasks = [created, ...state.tasks]
+        showToast('Task added')
+      }
+      closeTaskModal()
+      applySort()
+    } catch (error) {
+      showToast(error.message || 'Failed to save task')
+    }
+  })
 
   document.querySelectorAll('th[data-sort]').forEach((header) => {
     header.addEventListener('click', () => {

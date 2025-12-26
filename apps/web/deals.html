@@ -77,6 +77,12 @@
               <option value="owner">Sort: Owner</option>
               <option value="closeDate">Sort: Close Date</option>
             </select>
+            <button
+              id="add-deal"
+              class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700"
+            >
+              <i class="fa-solid fa-circle-plus mr-2"></i>Add Deal
+            </button>
           </div>
         </div>
 
@@ -175,6 +181,7 @@
                 <th class="px-4 py-3 cursor-pointer" data-sort="probability">Probability</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="owner">Owner</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="closeDate">Close Date</th>
+                <th class="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody id="deals-table"></tbody>
@@ -187,6 +194,95 @@
         </div>
       </section>
     </main>
+
+    <div
+      id="deal-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="deal-modal-title" class="text-xl font-semibold text-slate-800">Add Deal</h2>
+            <p class="text-sm text-slate-500">Fill in the deal details below.</p>
+          </div>
+          <button id="close-deal-modal" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <form id="deal-form" class="mt-6 space-y-4">
+          <div>
+            <label class="text-sm font-semibold text-slate-600">Deal name</label>
+            <input
+              id="deal-name"
+              class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              placeholder="New partnership"
+              required
+            />
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Company</label>
+              <select id="deal-company" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Stage</label>
+              <select id="deal-stage" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+            </div>
+          </div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Amount</label>
+              <input
+                id="deal-amount"
+                type="number"
+                min="0"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="25000"
+                required
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Probability %</label>
+              <input
+                id="deal-probability"
+                type="number"
+                min="0"
+                max="100"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="60"
+                required
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Close date</label>
+              <input
+                id="deal-close-date"
+                type="date"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                required
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              id="cancel-deal"
+              class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Save deal
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="js/deals.js"></script>
   </body>
