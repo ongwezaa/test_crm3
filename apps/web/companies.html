@@ -51,7 +51,19 @@
         </div>
       </header>
 
-      <section class="p-6">
+      <section class="p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">Company list</h2>
+            <p class="text-sm text-slate-500">Manage account profiles and metadata.</p>
+          </div>
+          <button
+            id="add-company"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700"
+          >
+            <i class="fa-solid fa-circle-plus mr-2"></i>Add Company
+          </button>
+        </div>
         <div class="card overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
@@ -61,6 +73,7 @@
                 <th class="px-4 py-3 cursor-pointer" data-sort="website">Website</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="phone">Phone</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="location">Location</th>
+                <th class="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody id="companies-table"></tbody>
@@ -69,6 +82,91 @@
         <div id="companies-pagination" class="flex flex-wrap items-center justify-between text-sm mt-3"></div>
       </section>
     </main>
+
+    <div
+      id="company-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="company-modal-title" class="text-xl font-semibold text-slate-800">Add Company</h2>
+            <p class="text-sm text-slate-500">Keep account information up to date.</p>
+          </div>
+          <button id="close-company-modal" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <form id="company-form" class="mt-6 space-y-4">
+          <div>
+            <label class="text-sm font-semibold text-slate-600">Company name</label>
+            <input
+              id="company-name"
+              class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Aurora Labs"
+              required
+            />
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Industry</label>
+              <input
+                id="company-industry"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Technology"
+                required
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Website</label>
+              <input
+                id="company-website"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="https://aurora.io"
+                required
+              />
+            </div>
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Phone</label>
+              <input
+                id="company-phone"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="+1 555 980 4321"
+                required
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Location</label>
+              <input
+                id="company-location"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Bangkok"
+                required
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              id="cancel-company"
+              class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Save company
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="js/companies.js"></script>
   </body>

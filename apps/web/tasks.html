@@ -51,7 +51,19 @@
         </div>
       </header>
 
-      <section class="p-6">
+      <section class="p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">Task queue</h2>
+            <p class="text-sm text-slate-500">Add and update tasks in one place.</p>
+          </div>
+          <button
+            id="add-task"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700"
+          >
+            <i class="fa-solid fa-circle-plus mr-2"></i>Add Task
+          </button>
+        </div>
         <div class="card overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
@@ -61,6 +73,7 @@
                 <th class="px-4 py-3 cursor-pointer" data-sort="priority">Priority</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="dueDate">Due Date</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="assignedTo">Assigned</th>
+                <th class="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody id="tasks-table"></tbody>
@@ -69,6 +82,70 @@
         <div id="tasks-pagination" class="flex flex-wrap items-center justify-between text-sm mt-3"></div>
       </section>
     </main>
+
+    <div
+      id="task-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="task-modal-title" class="text-xl font-semibold text-slate-800">Add Task</h2>
+            <p class="text-sm text-slate-500">Assign priorities and due dates.</p>
+          </div>
+          <button id="close-task-modal" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <form id="task-form" class="mt-6 space-y-4">
+          <div>
+            <label class="text-sm font-semibold text-slate-600">Task title</label>
+            <input
+              id="task-title"
+              class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Follow up with client"
+              required
+            />
+          </div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Status</label>
+              <select id="task-status" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Priority</label>
+              <select id="task-priority" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Due date</label>
+              <input
+                id="task-due-date"
+                type="date"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                required
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              id="cancel-task"
+              class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Save task
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="js/tasks.js"></script>
   </body>

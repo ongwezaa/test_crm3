@@ -8,7 +8,9 @@ const state = {
   sortBy: 'amount',
   sortDir: 'desc',
   page: 1,
-  pageSize: 10
+  pageSize: 10,
+  currentUser: null,
+  editingDealId: null
 }
 
 const stages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Won', 'Lost']
@@ -107,33 +109,22 @@ const renderTable = (deals) => {
     const row = document.createElement('tr')
     row.className = 'table-row border-b'
     row.innerHTML = `
-      <td class="px-4 py-3 font-medium" contenteditable data-field="name">${deal.name}</td>
+      <td class="px-4 py-3 font-medium">${deal.name}</td>
       <td class="px-4 py-3">${getCompanyName(deal.companyId)}</td>
       <td class="px-4 py-3">
-        <select class="border rounded px-2 py-1 text-sm" data-field="stage">
-          ${stages
-            .map((stage) => `<option value="${stage}" ${stage === deal.stage ? 'selected' : ''}>${stage}</option>`)
-            .join('')}
-        </select>
+        <span class="badge badge-${deal.stage.toLowerCase()}">${deal.stage}</span>
       </td>
-      <td class="px-4 py-3" contenteditable data-field="amount">${deal.amount}</td>
-      <td class="px-4 py-3" contenteditable data-field="probability">${deal.probability}</td>
+      <td class="px-4 py-3">${deal.amount}</td>
+      <td class="px-4 py-3">${deal.probability}</td>
       <td class="px-4 py-3 text-xs text-slate-500">${deal.ownerId.slice(0, 6).toUpperCase()}</td>
-      <td class="px-4 py-3" contenteditable data-field="closeDate">${deal.closeDate.slice(0, 10)}</td>
+      <td class="px-4 py-3">${deal.closeDate.slice(0, 10)}</td>
+      <td class="px-4 py-3">
+        <button class="edit-deal text-indigo-600 text-sm font-semibold" data-id="${deal.id}">
+          Edit
+        </button>
+      </td>
     `
-
-    row.querySelectorAll('[contenteditable]').forEach((cell) => {
-      cell.addEventListener('blur', async (event) => {
-        const field = event.target.dataset.field
-        const value = event.target.textContent.trim()
-        await saveDealUpdate(deal, { [field]: field === 'amount' || field === 'probability' ? Number(value) : value })
-      })
-    })
-
-    row.querySelector('select[data-field="stage"]').addEventListener('change', async (event) => {
-      const stage = event.target.value
-      await saveStageUpdate(deal, stage)
-    })
+    row.querySelector('.edit-deal').addEventListener('click', () => openDealModal('edit', deal))
 
     tbody.appendChild(row)
   })
@@ -159,12 +150,17 @@ const renderPipeline = (deals) => {
         <div class="font-semibold text-sm">${deal.name}</div>
         <div class="text-xs text-slate-500">${getCompanyName(deal.companyId)}</div>
         <div class="text-sm font-semibold text-indigo-600 mt-2">${formatMoney(deal.amount)}</div>
-        <div class="flex gap-2 mt-2">
+        <div class="flex flex-wrap gap-2 mt-2">
           ${index > 0 ? '<button class="text-xs px-2 py-1 border rounded" data-dir="prev">Back</button>' : ''}
           ${index < stages.length - 1 ? '<button class="text-xs px-2 py-1 border rounded" data-dir="next">Forward</button>' : ''}
+          <button class="text-xs px-2 py-1 border rounded text-indigo-600" data-edit="edit">Edit</button>
         </div>
       `
       card.querySelectorAll('button').forEach((button) => {
+        if (button.dataset.edit) {
+          button.addEventListener('click', () => openDealModal('edit', deal))
+          return
+        }
         button.addEventListener('click', async () => {
           const direction = button.dataset.dir
           const nextStage = stages[index + (direction === 'next' ? 1 : -1)]
@@ -251,16 +247,6 @@ const applyFilters = () => {
   renderInsights()
 }
 
-const saveDealUpdate = async (deal, payload) => {
-  try {
-    const updated = await api.updateDeal(deal.id, { ...deal, ...payload })
-    state.deals = state.deals.map((item) => (item.id === deal.id ? updated : item))
-    showToast('Deal updated')
-  } catch (error) {
-    showToast(error.message || 'Failed to update deal')
-  }
-}
-
 const saveStageUpdate = async (deal, stage) => {
   try {
     const updated = await api.updateDealStage(deal.id, stage)
@@ -272,15 +258,65 @@ const saveStageUpdate = async (deal, stage) => {
   }
 }
 
+const openDealModal = (mode, deal = null) => {
+  const modal = document.getElementById('deal-modal')
+  const title = document.getElementById('deal-modal-title')
+  const nameInput = document.getElementById('deal-name')
+  const companySelect = document.getElementById('deal-company')
+  const stageSelect = document.getElementById('deal-stage')
+  const amountInput = document.getElementById('deal-amount')
+  const probabilityInput = document.getElementById('deal-probability')
+  const closeDateInput = document.getElementById('deal-close-date')
+
+  title.textContent = mode === 'edit' ? 'Edit Deal' : 'Add Deal'
+  if (mode === 'edit' && deal) {
+    state.editingDealId = deal.id
+    nameInput.value = deal.name
+    companySelect.value = deal.companyId
+    stageSelect.value = deal.stage
+    amountInput.value = deal.amount
+    probabilityInput.value = deal.probability
+    closeDateInput.value = deal.closeDate.slice(0, 10)
+  } else {
+    state.editingDealId = null
+    nameInput.value = ''
+    companySelect.value = state.companies[0]?.id || ''
+    stageSelect.value = stages[0]
+    amountInput.value = ''
+    probabilityInput.value = '50'
+    closeDateInput.value = new Date().toISOString().slice(0, 10)
+  }
+
+  modal.classList.remove('hidden')
+  modal.classList.add('flex')
+}
+
+const closeDealModal = () => {
+  const modal = document.getElementById('deal-modal')
+  modal.classList.add('hidden')
+  modal.classList.remove('flex')
+}
+
+const populateDealModal = () => {
+  const companySelect = document.getElementById('deal-company')
+  const stageSelect = document.getElementById('deal-stage')
+  companySelect.innerHTML = state.companies
+    .map((company) => `<option value="${company.id}">${company.name}</option>`)
+    .join('')
+  stageSelect.innerHTML = stages.map((stage) => `<option value="${stage}">${stage}</option>`).join('')
+}
+
 const init = async () => {
   const user = await ensureAuth()
   if (!user) return
   setUserHeader(user)
   setupLogout()
+  state.currentUser = user
 
   const [deals, companies] = await Promise.all([api.getDeals(), api.getCompanies()])
   state.deals = deals
   state.companies = companies
+  populateDealModal()
 
   document.getElementById('table-view').addEventListener('click', () => {
     state.view = 'table'
@@ -303,6 +339,44 @@ const init = async () => {
     state.sortDir = 'desc'
     applyFilters()
   })
+
+  document.getElementById('add-deal').addEventListener('click', () => openDealModal('add'))
+  document.getElementById('close-deal-modal').addEventListener('click', closeDealModal)
+  document.getElementById('cancel-deal').addEventListener('click', closeDealModal)
+  document.getElementById('deal-modal').addEventListener('click', (event) => {
+    if (event.target.id === 'deal-modal') {
+      closeDealModal()
+    }
+  })
+  document.getElementById('deal-form').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const payload = {
+      name: document.getElementById('deal-name').value.trim(),
+      companyId: document.getElementById('deal-company').value,
+      stage: document.getElementById('deal-stage').value,
+      amount: Number(document.getElementById('deal-amount').value),
+      probability: Number(document.getElementById('deal-probability').value),
+      closeDate: document.getElementById('deal-close-date').value,
+      ownerId: state.currentUser?.id || ''
+    }
+
+    try {
+      if (state.editingDealId) {
+        const updated = await api.updateDeal(state.editingDealId, payload)
+        state.deals = state.deals.map((item) => (item.id === updated.id ? updated : item))
+        showToast('Deal updated')
+      } else {
+        const created = await api.createDeal(payload)
+        state.deals = [created, ...state.deals]
+        showToast('Deal added')
+      }
+      closeDealModal()
+      applyFilters()
+    } catch (error) {
+      showToast(error.message || 'Failed to save deal')
+    }
+  })
+
   document.querySelectorAll('th[data-sort]').forEach((header) => {
     header.addEventListener('click', () => {
       const field = header.dataset.sort

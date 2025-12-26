@@ -1,5 +1,5 @@
 import { api } from './api.js'
-import { ensureAuth, setUserHeader, setupLogout } from './common.js'
+import { ensureAuth, setUserHeader, setupLogout, showToast } from './common.js'
 
 const state = {
   contacts: [],
@@ -7,7 +7,9 @@ const state = {
   sortBy: 'name',
   sortDir: 'asc',
   page: 1,
-  pageSize: 10
+  pageSize: 10,
+  currentUser: null,
+  editingContactId: null
 }
 
 const render = (contacts) => {
@@ -23,7 +25,11 @@ const render = (contacts) => {
       <td class="px-4 py-3 text-slate-500">${contact.title}</td>
       <td class="px-4 py-3 text-indigo-600">${contact.email}</td>
       <td class="px-4 py-3">${contact.phone}</td>
+      <td class="px-4 py-3">
+        <button class="edit-contact text-indigo-600 text-sm font-semibold" data-id="${contact.id}">Edit</button>
+      </td>
     `
+    row.querySelector('.edit-contact').addEventListener('click', () => openContactModal('edit', contact))
     tbody.appendChild(row)
   })
 }
@@ -78,15 +84,96 @@ const applySort = () => {
 
 const getCompanyName = (id) => state.companies.find((item) => item.id === id)?.name || 'Unknown'
 
+const populateContactModal = () => {
+  const companySelect = document.getElementById('contact-company')
+  companySelect.innerHTML = state.companies
+    .map((company) => `<option value="${company.id}">${company.name}</option>`)
+    .join('')
+}
+
+const openContactModal = (mode, contact = null) => {
+  const modal = document.getElementById('contact-modal')
+  const title = document.getElementById('contact-modal-title')
+  const nameInput = document.getElementById('contact-name')
+  const companySelect = document.getElementById('contact-company')
+  const titleInput = document.getElementById('contact-title')
+  const emailInput = document.getElementById('contact-email')
+  const phoneInput = document.getElementById('contact-phone')
+
+  title.textContent = mode === 'edit' ? 'Edit Contact' : 'Add Contact'
+  if (mode === 'edit' && contact) {
+    state.editingContactId = contact.id
+    nameInput.value = contact.name
+    companySelect.value = contact.companyId
+    titleInput.value = contact.title
+    emailInput.value = contact.email
+    phoneInput.value = contact.phone
+  } else {
+    state.editingContactId = null
+    nameInput.value = ''
+    companySelect.value = state.companies[0]?.id || ''
+    titleInput.value = ''
+    emailInput.value = ''
+    phoneInput.value = ''
+  }
+
+  modal.classList.remove('hidden')
+  modal.classList.add('flex')
+}
+
+const closeContactModal = () => {
+  const modal = document.getElementById('contact-modal')
+  modal.classList.add('hidden')
+  modal.classList.remove('flex')
+}
+
 const init = async () => {
   const user = await ensureAuth()
   if (!user) return
   setUserHeader(user)
   setupLogout()
+  state.currentUser = user
 
   const [contacts, companies] = await Promise.all([api.getContacts(), api.getCompanies()])
   state.contacts = contacts
   state.companies = companies
+  populateContactModal()
+
+  document.getElementById('add-contact').addEventListener('click', () => openContactModal('add'))
+  document.getElementById('close-contact-modal').addEventListener('click', closeContactModal)
+  document.getElementById('cancel-contact').addEventListener('click', closeContactModal)
+  document.getElementById('contact-modal').addEventListener('click', (event) => {
+    if (event.target.id === 'contact-modal') {
+      closeContactModal()
+    }
+  })
+  document.getElementById('contact-form').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const payload = {
+      name: document.getElementById('contact-name').value.trim(),
+      companyId: document.getElementById('contact-company').value,
+      title: document.getElementById('contact-title').value.trim(),
+      email: document.getElementById('contact-email').value.trim(),
+      phone: document.getElementById('contact-phone').value.trim(),
+      ownerId: state.currentUser?.id || ''
+    }
+
+    try {
+      if (state.editingContactId) {
+        const updated = await api.updateContact(state.editingContactId, payload)
+        state.contacts = state.contacts.map((item) => (item.id === updated.id ? updated : item))
+        showToast('Contact updated')
+      } else {
+        const created = await api.createContact(payload)
+        state.contacts = [created, ...state.contacts]
+        showToast('Contact added')
+      }
+      closeContactModal()
+      applySort()
+    } catch (error) {
+      showToast(error.message || 'Failed to save contact')
+    }
+  })
 
   document.querySelectorAll('th[data-sort]').forEach((header) => {
     header.addEventListener('click', () => {

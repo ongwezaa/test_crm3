@@ -51,7 +51,19 @@
         </div>
       </header>
 
-      <section class="p-6">
+      <section class="p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">Contact directory</h2>
+            <p class="text-sm text-slate-500">Keep people profiles consistent and current.</p>
+          </div>
+          <button
+            id="add-contact"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700"
+          >
+            <i class="fa-solid fa-circle-plus mr-2"></i>Add Contact
+          </button>
+        </div>
         <div class="card overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-left">
@@ -61,6 +73,7 @@
                 <th class="px-4 py-3 cursor-pointer" data-sort="title">Title</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="email">Email</th>
                 <th class="px-4 py-3 cursor-pointer" data-sort="phone">Phone</th>
+                <th class="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody id="contacts-table"></tbody>
@@ -69,6 +82,87 @@
         <div id="contacts-pagination" class="flex flex-wrap items-center justify-between text-sm mt-3"></div>
       </section>
     </main>
+
+    <div
+      id="contact-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="contact-modal-title" class="text-xl font-semibold text-slate-800">Add Contact</h2>
+            <p class="text-sm text-slate-500">Capture the latest contact information.</p>
+          </div>
+          <button id="close-contact-modal" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <form id="contact-form" class="mt-6 space-y-4">
+          <div>
+            <label class="text-sm font-semibold text-slate-600">Full name</label>
+            <input
+              id="contact-name"
+              class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Siriwan K."
+              required
+            />
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Company</label>
+              <select id="contact-company" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Title</label>
+              <input
+                id="contact-title"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Head of Growth"
+                required
+              />
+            </div>
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Email</label>
+              <input
+                id="contact-email"
+                type="email"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="siriwan@company.com"
+                required
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-600">Phone</label>
+              <input
+                id="contact-phone"
+                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="+66 98 555 4000"
+                required
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              id="cancel-contact"
+              class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Save contact
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="js/contacts.js"></script>
   </body>
