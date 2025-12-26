@@ -11,7 +11,7 @@ import dashboardRoutes from './routes/dashboard.js'
 import activityRoutes from './routes/activities.js'
 
 const app = express()
-const PORT = 4005
+const PORT = Number(process.env.PORT || 4005)
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const webRoot = path.resolve(__dirname, '..', '..', 'web')
