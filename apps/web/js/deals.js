@@ -22,6 +22,12 @@ const formatMoney = (value) => `$${Number(value).toLocaleString()}`
 
 const formatPercent = (value) => `${Math.round(value)}%`
 
+const getProbabilityColor = (value) => {
+  const clamped = Math.max(0, Math.min(100, Number(value) || 0))
+  const lightness = 75 - clamped * 0.3
+  return `hsl(210, 85%, ${lightness}%)`
+}
+
 const daysUntil = (dateString) => {
   const date = new Date(dateString)
   if (Number.isNaN(date.getTime())) return null
@@ -111,11 +117,15 @@ const renderTable = (deals) => {
     row.innerHTML = `
       <td class="px-4 py-3 font-medium">${deal.name}</td>
       <td class="px-4 py-3">${getCompanyName(deal.companyId)}</td>
-      <td class="px-4 py-3">
-        <span class="badge badge-${deal.stage.toLowerCase()}">${deal.stage}</span>
+      <td class="stage-cell">
+        <div class="cell-fill stage-fill stage-fill-${deal.stage.toLowerCase()}">${deal.stage}</div>
       </td>
       <td class="px-4 py-3">${deal.amount}</td>
-      <td class="px-4 py-3">${deal.probability}</td>
+      <td class="probability-cell">
+        <div class="cell-fill probability-fill" style="background:${getProbabilityColor(deal.probability)}">
+          ${formatPercent(deal.probability)}
+        </div>
+      </td>
       <td class="px-4 py-3 text-xs text-slate-500">${deal.ownerId.slice(0, 6).toUpperCase()}</td>
       <td class="px-4 py-3">${deal.closeDate.slice(0, 10)}</td>
       <td class="px-4 py-3">

@@ -29,6 +29,37 @@ body {
 .badge-won { background: #d1fae5; color: #065f46; }
 .badge-lost { background: #fee2e2; color: #991b1b; }
 
+.stage-cell,
+.probability-cell {
+  padding: 0;
+}
+
+.cell-fill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 12px 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.stage-fill {
+  color: #fff;
+}
+
+.stage-fill-lead { background: #38bdf8; }
+.stage-fill-qualified { background: #22c55e; }
+.stage-fill-proposal { background: #a855f7; }
+.stage-fill-negotiation { background: #f59e0b; }
+.stage-fill-won { background: #10b981; }
+.stage-fill-lost { background: #ef4444; }
+
+.probability-fill {
+  color: #fff;
+}
+
 .toast {
   position: fixed;
   right: 24px;
